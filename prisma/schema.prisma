@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Aerolinea {
+  ID_AEROLINEA Int    @id
+  NOMBRE       String
+  PAIS         String
+
+  Vuelo Vuelo[]
+}
+
+model Aeropuerto {
+  ID_AEROPUERTO String  @id
+  NOMBRE        String
+  CIUDAD        String
+  PAIS          String
+  VueloDes      Vuelo[] @relation("Vuelo Destino")
+  VueloOri      Vuelo[] @relation("Vuelo Origen")
+}
+
+model Avion {
+  NSERIE            String   @id
+  MODELO            String
+  CAPACIDAD         Int
+  FECHA_FABRICACION DateTime
+  MARCA             String
+  Vuelo             Vuelo[]
+}
+
+model Pasajero {
+  RFC              String   @id @unique
+  NOMBRE           String
+  PAPELLIDO        String
+  SAPELLIDO        String?
+  TELEFONO         String?
+  EMAIL            String   @unique
+  FECHA_NACIMIENTO DateTime
+  NACIONALIDAD     String
+  PASAPORTE        String
+  Compra           Compra[]
+}
+
+model Piloto {
+  RFC       String  @id
+  NOMBRE    String
+  PAPELLIDO String
+  SAPELLIDO String?
+  EMAIL     String
+  Vuelo     Vuelo[]
+}
+
+model Vuelo {
+  NUMERO_VUELO  Int      @id
+  RFC_PILOTO    String
+  ID_AEROLINEA  Int
+  NSERIE_AVION  String
+  PRECIO        Float
+  FECHA_LLEGADA DateTime
+  FECHA_SALIDA  DateTime
+  DESTINO       String
+  ORIGEN        String
+  HORAS_VUELO   Int
+
+  aerolinea         Aerolinea  @relation(fields: [ID_AEROLINEA], references: [ID_AEROLINEA])
+  avion             Avion      @relation(fields: [NSERIE_AVION], references: [NSERIE])
+  piloto            Piloto     @relation(fields: [RFC_PILOTO], references: [RFC])
+  aeropuertoDestino Aeropuerto @relation(name: "Vuelo Destino", fields: [DESTINO], references: [ID_AEROPUERTO])
+  aeropuertoOrigen  Aeropuerto @relation(name: "Vuelo Origen", fields: [ORIGEN], references: [ID_AEROPUERTO])
+
+  compras Compra[]
+}
+
+model Compra {
+  FECHA       DateTime @unique
+  VUELO       Int
+  PASAJERO    String
+  COSTO_TOTAL Float
+
+  pasajero Pasajero @relation(fields: [PASAJERO], references: [EMAIL])
+  vuelo    Vuelo    @relation(fields: [VUELO], references: [NUMERO_VUELO])
+}
