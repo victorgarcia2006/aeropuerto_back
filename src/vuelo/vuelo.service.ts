@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateVueloDto } from './dto/create-vuelo.dto';
-import { UpdateVueloDto } from './dto/update-vuelo.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Vuelo } from '@prisma/client';
 
